@@ -20,6 +20,8 @@ class Payment extends Model
         'verified_at',
     ];
 
+    public $timestamps = false;
+
     protected $casts = [
         'verified_at' => 'datetime',
     ];

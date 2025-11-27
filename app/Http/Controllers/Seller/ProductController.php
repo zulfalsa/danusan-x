@@ -14,7 +14,7 @@ class ProductController extends Controller
     public function index()
     {
         $products = Product::where('seller_id', Auth::user()->user_id)->get();
-        return Inertia::render('Seller/Products/Index', ['products' => $products]);
+        return Inertia::render('seller/products/index', ['products' => $products]);
     }
 
     public function store(Request $request)

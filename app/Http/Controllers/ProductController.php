@@ -12,7 +12,7 @@ class ProductController extends Controller
     {
         $products = Product::with('seller:user_id,name')->latest()->get();
 
-        return Inertia::render('Welcome', [
+        return Inertia::render('welcome', [
             'products' => $products
         ]);
     }
@@ -21,7 +21,7 @@ class ProductController extends Controller
     {
         $product = Product::with('seller:user_id,name')->findOrFail($id);
 
-        return Inertia::render('Product/Show', [
+        return Inertia::render('product/show', [
             'product' => $product
         ]);
     }

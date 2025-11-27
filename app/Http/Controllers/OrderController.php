@@ -15,7 +15,7 @@ class OrderController extends Controller
 {
     public function create()
     {
-        return Inertia::render('Order/Checkout');
+        return Inertia::render('order/checkout');
     }
 
     public function store(Request $request)
@@ -68,7 +68,7 @@ class OrderController extends Controller
         
         $payment = Payment::where('order_id', $order->order_id)->first();
 
-        return Inertia::render('Order/Payment', [
+        return Inertia::render('order/payment', [
             'order' => $order,
             'payment' => $payment,
             'qris_url' => asset('images/qris-dummy.jpg') // Ganti dengan path QRIS asli
@@ -101,7 +101,7 @@ class OrderController extends Controller
                 ->first();
         }
 
-        return Inertia::render('Order/Track', [
+        return Inertia::render('order/track', [
             'order' => $order
         ]);
     }

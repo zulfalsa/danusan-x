@@ -1,100 +1,114 @@
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Head, useForm } from '@inertiajs/react';
-import { AlertCircle, CheckCircle2 } from 'lucide-react';
+import React, { useState } from 'react'; 
+import { Link } from '@inertiajs/react';
+import { CheckCircle, Package, LogIn, Search, ShoppingCart, Menu, X, Clipboard, ArrowLeft } from 'lucide-react';
 
-declare global {
-    var route: any;
+interface Props {
+  order_id: string; 
 }
 
-export default function Payment({ order, payment, qris_url }: any) {
-    const { data, setData, post, progress, processing } = useForm({
-        proof: null as File | null,
-    });
+function Payment({ order_id }: Props) {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
 
-    const handleUpload = (e: React.FormEvent) => {
-        e.preventDefault();
-        post(`/order/payment/${order.order_id}`, {
-            forceFormData: true
-        }  
-        );
-    };
+  const handleCopy = () => {
+    const idToCopy = order_id;
+    const tempInput = document.createElement('input');
+    tempInput.value = idToCopy;
+    document.body.appendChild(tempInput);
+    tempInput.select();
+    document.execCommand('copy');
+    document.body.removeChild(tempInput);
 
-    return (
-        <div className="min-h-screen bg-gray-50 py-10 px-4">
-            <Head title={`Pembayaran - ${order.tracking_code}`} />
-            
-            <div className="max-w-xl mx-auto space-y-6">
-                <Card className={`border-l-4 ${order.status === 'menunggu verifikasi' ? 'border-yellow-500' : 'border-blue-500'}`}>
-                    <CardContent className="pt-6 flex items-center gap-3">
-                        <AlertCircle className="h-6 w-6 text-gray-600" />
-                        <div>
-                            <p className="font-bold uppercase">{order.status}</p>
-                            <p className="text-sm text-gray-500">Kode Tracking: <span className="font-mono font-bold">{order.tracking_code}</span></p>
-                        </div>
-                    </CardContent>
-                </Card>
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Instruksi Pembayaran</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-6">
-                        <div className="text-center">
-                            <p className="text-sm text-gray-500 mb-2">Total Tagihan</p>
-                            <p className="text-3xl font-bold text-primary">Rp {order.total_price.toLocaleString('id-ID')}</p>
-                        </div>
-
-                        <div className="flex justify-center">
-                            <div className="border-2 border-dashed border-gray-300 p-4 rounded-lg bg-white">
-                                <img src={qris_url} alt="QRIS Code" className="w-48 h-48 object-contain" />
-                            </div>
-                        </div>
-                        <p className="text-center text-sm text-gray-500">Scan QRIS di atas untuk membayar.</p>
-                    </CardContent>
-                </Card>
-
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Konfirmasi Pembayaran</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        {payment ? (
-                             <div className="text-center py-6 space-y-3">
-                                <div className="flex justify-center text-green-500">
-                                    <CheckCircle2 className="h-12 w-12" />
-                                </div>
-                                <h3 className="font-bold text-lg">Bukti Terkirim!</h3>
-                                <p className="text-gray-500">Admin sedang memverifikasi pembayaran Anda.</p>
-                                <img src={`/storage/${payment.proof}`} alt="Bukti" className="h-32 mx-auto mt-4 rounded border" />
-                            </div>
-                        ) : (
-                            <form onSubmit={handleUpload} className="space-y-4">
-                                <div className="space-y-2">
-                                    <Label htmlFor="proof">Unggah Bukti Transfer</Label>
-                                    <Input 
-                                        id="proof" 
-                                        type="file" 
-                                        accept="image/*"
-                                        onChange={e => setData('proof', e.currentTarget.files ? e.currentTarget.files[0] : null)}
-                                        required
-                                    />
-                                    {progress && (
-                                      <div className="w-full bg-gray-200 rounded-full h-2.5">
-                                        <div className="bg-blue-600 h-2.5 rounded-full" style={{ width: `${progress.percentage}%` }}></div>
-                                      </div>
-                                    )}
-                                </div>
-                                <Button type="submit" className="w-full" disabled={processing}>
-                                    Kirim Bukti Pembayaran
-                                </Button>
-                            </form>
-                        )}
-                    </CardContent>
-                </Card>
+  return (
+    <div className="min-h-screen bg-[#FFF7ED] font-sans text-gray-800">
+      
+      {/* HEADER */}
+      <header className="bg-orange-500 text-white shadow-md sticky top-0 z-50">
+        <div className="container mx-auto px-4 py-3 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-3 hover:opacity-90 transition-opacity">
+            <div className="bg-transparent border-2 border-white rounded p-1">
+              <Package size={24} strokeWidth={2.5} />
             </div>
+            <h1 className="text-xl md:text-2xl font-bold tracking-wide">Danusan-X</h1>
+          </Link>
+
+          <div className="hidden md:flex items-center gap-6">
+            <Link href="/auth/gate" className="flex items-center gap-1 bg-orange-700 hover:bg-orange-800 transition-colors px-3 py-1.5 rounded-md font-medium text-sm">
+              <LogIn size={18} />
+              <span>Login Staff</span>
+            </Link>
+            <Link href="/track" className="flex items-center gap-1 hover:text-orange-100 transition-colors">
+              <Search size={20} />
+              <span className="font-medium">Lacak</span>
+            </Link>
+            <Link href="/cart" className="hover:text-orange-100 relative">
+              <ShoppingCart size={24} />
+            </Link>
+          </div>
+
+          <button className="md:hidden text-white" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
         </div>
-    );
+      </header>
+
+      {/* KONTEN UTAMA */}
+      <main className="container mx-auto px-4 py-12 flex flex-col items-center justify-center min-h-[80vh]">
+        
+        <div className="bg-white p-8 rounded-lg shadow-md max-w-lg w-full text-center border border-gray-100">
+          
+          {/* Icon Sukses */}
+          <div className="flex justify-center mb-6">
+            <CheckCircle size={80} className="text-green-600 fill-green-100" />
+          </div>
+
+          <h2 className="text-xl font-bold text-black mb-6">Pesanan Berhasil Dibuat!</h2>
+
+          {/* Kotak ID Pesanan */}
+          <div className="bg-gray-200 rounded-md p-6 mb-4">
+            <p className="text-gray-500 text-sm mb-1 uppercase tracking-wider">ID PESANAN</p>
+            <p className="text-4xl font-bold text-black tracking-widest mb-3">{order_id}</p>
+            
+            <button 
+                onClick={handleCopy}
+                className={`text-sm font-medium transition-colors inline-flex items-center gap-1 px-3 py-1 rounded-full ${copied ? 'bg-green-500 text-white' : 'text-red-500 hover:bg-red-50'}`}
+            >
+                <Clipboard size={14} />
+                {copied ? 'ID Tersalin!' : 'Simpan ID untuk Pengecekan'}
+            </button>
+          </div>
+
+          <p className="text-gray-500 text-sm mb-8">
+            Silakan cek status pesanan Anda.
+          </p>
+
+          {/* Tombol Aksi */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            
+            <Link 
+                href={`/track?code=${order_id}`} // Mengarahkan ke halaman lacak dengan ID yang sudah terisi
+                className="px-6 py-3 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold rounded-md transition-colors w-full sm:w-auto flex justify-center items-center"
+            >
+                Lacak Status
+            </Link>
+            
+            <Link 
+              href="/" 
+              className="px-6 py-3 bg-[#FF6B00] hover:bg-orange-600 text-white font-bold rounded-md transition-colors w-full sm:w-auto flex justify-center items-center"
+            >
+              Kembali ke Beranda
+            </Link>
+          </div>
+
+        </div>
+
+      </main>
+    </div>
+  );
 }
+
+export default Payment;

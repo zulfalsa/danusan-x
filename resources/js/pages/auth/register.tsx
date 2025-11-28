@@ -1,136 +1,140 @@
-import { Head, Link, useForm } from '@inertiajs/react';
-import { FormEventHandler } from 'react';
-import AuthLayout from '@/layouts/auth-layout';
-import InputError from '@/components/input-error';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Loader2 } from 'lucide-react'; 
+import React, { useState } from 'react';
+import { ShoppingCart, Lock, Search } from 'lucide-react';
 
-export default function Register() {
-    const { data, setData, post, processing, errors, reset } = useForm({
-        name: '',
-        email: '',
-        password: '',
-        password_confirmation: '',
-        role: 'admin', 
-    });
+// Komponen Header Navigasi yang sama di semua halaman Auth
+const AuthHeader = () => (
+  <header className="bg-orange-600 shadow-xl fixed top-0 left-0 right-0 z-10">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div className="text-2xl font-bold tracking-wider text-white">
+        Danusan<span className="text-yellow-200">-X</span>
+      </div>
+      <div className="flex items-center space-x-4">
+        <a href="/login" className="flex items-center px-4 py-2 bg-orange-700 text-white rounded-lg text-sm font-medium hover:bg-orange-800 transition duration-150">
+          <Lock className="w-4 h-4 mr-1" /> Login Staff
+        </a>
+        <button className="flex items-center text-white hover:text-gray-200 transition duration-150">
+          <Search className="w-5 h-5 mr-1" /> Lacak
+        </button>
+        <button className="relative p-2 text-white hover:text-gray-200 transition duration-150">
+          <ShoppingCart className="w-6 h-6" />
+          {/* Badge untuk Keranjang */}
+          <span className="absolute top-0 right-0 block h-3 w-3 rounded-full ring-2 ring-orange-600 bg-red-500 text-xs text-white"></span>
+        </button>
+      </div>
+    </div>
+  </header>
+);
 
-    const submit: FormEventHandler = (e) => {
-        e.preventDefault();
+// Komponen Utama Daftar Akun Baru
+export default function RegisterPage() {
+  const [role, setRole] = useState('Penjual');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
-        post('/register', {
-            onFinish: () => reset('password', 'password_confirmation'),
-        });
-    };
+  // Asumsi fungsi ini akan dipanggil untuk memproses pendaftaran ke backend
+  // Tipe e diubah menjadi React.FormEvent<HTMLFormElement> untuk form submit
+  const handleRegister = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError('');
 
-    return (
-        <AuthLayout
-            title="Buat Akun Baru"
-            description="Masukkan detail Anda di bawah ini untuk mendaftar"
-        >
-            <Head title="Daftar Akun" />
+    if (role && username && password) {
+      console.log('Attempting registration...');
+      // Setelah berhasil daftar, arahkan ke halaman login
+      // window.location.href = '/login'; 
+    } else {
+      setError('Semua kolom wajib diisi.');
+    }
+  };
 
-            <form onSubmit={submit} className="flex flex-col gap-6">
-                <div className="grid gap-6">
-                    {/* Nama */}
-                    <div className="grid gap-2">
-                        <Label htmlFor="name">Nama Lengkap</Label>
-                        <Input
-                            id="name"
-                            name="name"
-                            value={data.name}
-                            className="block w-full"
-                            autoComplete="name"
-                            autoFocus
-                            onChange={(e) => setData('name', e.target.value)}
-                            required
-                        />
-                        <InputError message={errors.name} className="mt-2" />
-                    </div>
+  // Tipe e diubah menjadi React.ChangeEvent<HTMLInputElement | HTMLSelectElement> untuk input dan select
+  const handleRoleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+      setRole(e.target.value);
+  }
 
-                    {/* Email */}
-                    <div className="grid gap-2">
-                        <Label htmlFor="email">Email</Label>
-                        <Input
-                            id="email"
-                            type="email"
-                            name="email"
-                            value={data.email}
-                            className="block w-full"
-                            autoComplete="username"
-                            onChange={(e) => setData('email', e.target.value)}
-                            required
-                        />
-                        <InputError message={errors.email} className="mt-2" />
-                    </div>
+  // Tipe e diubah menjadi React.ChangeEvent<HTMLInputElement | HTMLSelectElement> untuk input dan select
+  const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      setUsername(e.target.value);
+  }
 
-                    {/* Pilihan Role */}
-                    <div className="grid gap-2">
-                        <Label htmlFor="role">Daftar Sebagai</Label>
-                        <select
-                            id="role"
-                            name="role"
-                            value={data.role}
-                            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                            onChange={(e) => setData('role', e.target.value)}
-                            required
-                        >
-                            <option value="admin">Admin</option>
-                            <option value="seller">Seller</option>
-                        </select>
-                        {/* @ts-ignore - Mengabaikan error tipe role di TS jika properti dinamis */}
-                        <InputError message={errors.role} className="mt-2" />
-                    </div>
+  // Tipe e diubah menjadi React.ChangeEvent<HTMLInputElement | HTMLSelectElement> untuk input dan select
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      setPassword(e.target.value);
+  }
 
-                    {/* Password */}
-                    <div className="grid gap-2">
-                        <Label htmlFor="password">Password</Label>
-                        <Input
-                            id="password"
-                            type="password"
-                            name="password"
-                            value={data.password}
-                            className="block w-full"
-                            autoComplete="new-password"
-                            onChange={(e) => setData('password', e.target.value)}
-                            required
-                        />
-                        <InputError message={errors.password} className="mt-2" />
-                    </div>
+  return (
+    <div className="min-h-screen bg-gray-100 flex flex-col pt-16">
+      <AuthHeader />
+      
+      <main className="flex-1 flex items-center justify-center p-4">
+        <div className="w-full max-w-xs bg-white p-8 rounded-xl shadow-2xl border border-gray-200">
+          <h2 className="text-2xl font-bold text-gray-800 text-center mb-8">Daftar Akun Baru</h2>
+          
+          <form onSubmit={handleRegister} className="space-y-4">
+            {/* Input Role */}
+            <div>
+              <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-1">
+                Role
+              </label>
+              <select
+                id="role"
+                name="role"
+                required
+                value={role}
+                onChange={handleRoleChange} // Menggunakan fungsi handler spesifik
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-orange-500 focus:border-orange-500 appearance-none bg-white"
+              >
+                <option value="Penjual">Penjual</option>
+                <option value="Admin">Admin</option>
+              </select>
+            </div>
 
-                    {/* Konfirmasi Password */}
-                    <div className="grid gap-2">
-                        <Label htmlFor="password_confirmation">Konfirmasi Password</Label>
-                        <Input
-                            id="password_confirmation"
-                            type="password"
-                            name="password_confirmation"
-                            value={data.password_confirmation}
-                            className="block w-full"
-                            autoComplete="new-password"
-                            onChange={(e) => setData('password_confirmation', e.target.value)}
-                            required
-                        />
-                        <InputError message={errors.password_confirmation} className="mt-2" />
-                    </div>
+            {/* Input Username */}
+            <div>
+              <label htmlFor="username" className="sr-only">Username</label>
+              <input
+                id="username"
+                name="username"
+                type="text"
+                required
+                value={username}
+                onChange={handleUsernameChange} // Menggunakan fungsi handler spesifik
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-orange-500 focus:border-orange-500"
+                placeholder="Username"
+              />
+            </div>
+            
+            {/* Input Password */}
+            <div>
+              <label htmlFor="password" className="sr-only">Password</label>
+              <input
+                id="password"
+                name="password"
+                type="password"
+                required
+                value={password}
+                onChange={handlePasswordChange} // Menggunakan fungsi handler spesifik
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-orange-500 focus:border-orange-500"
+                placeholder="Password"
+              />
+              {error && <p className="mt-2 text-sm text-red-600 text-center">{error}</p>}
+            </div>
+            
+            <button
+              type="submit"
+              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-lg shadow-md text-sm font-bold text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition duration-150 mt-6"
+            >
+              Daftar Sekarang
+            </button>
+          </form>
 
-                    <Button type="submit" className="w-full" disabled={processing}>
-                        {processing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                        Daftar Sekarang
-                    </Button>
-                </div>
-
-                <div className="text-center text-sm text-muted-foreground">
-                    Sudah punya akun?{' '}
-                    <Link
-                        href="/login"
-                        className="underline underline-offset-4 hover:text-primary"
-                    >
-                        Masuk (Login)
-                    </Link>
-                </div>
-            </form>
-        </AuthLayout>
-    );
+          <div className="mt-4 text-center">
+            <a href="/login" className="text-sm font-medium text-gray-600 hover:text-gray-900">
+              Sudah punya akun? Login disini
+            </a>
+          </div>
+        </div>
+      </main>
+    </div>
+  );
 }

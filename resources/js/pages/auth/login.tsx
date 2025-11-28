@@ -1,120 +1,117 @@
-import InputError from '@/components/input-error';
-import TextLink from '@/components/text-link';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Spinner } from '@/components/ui/spinner';
-import AuthLayout from '@/layouts/auth-layout';
-import { register } from '@/routes';
-import { store } from '@/routes/login';
-import { request } from '@/routes/password';
-import { Form, Head } from '@inertiajs/react';
+import React, { useState } from 'react';
+import { ShoppingCart, Lock, Search } from 'lucide-react';
 
-interface LoginProps {
-    status?: string;
-    canResetPassword: boolean;
-    canRegister: boolean;
-}
+// Komponen Header Navigasi yang sama di semua halaman Auth
+const AuthHeader = () => (
+  <header className="bg-orange-600 shadow-xl fixed top-0 left-0 right-0 z-10">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div className="text-2xl font-bold tracking-wider text-white">
+        Danusan<span className="text-yellow-200">-X</span>
+      </div>
+      <div className="flex items-center space-x-4">
+        <a href="/login" className="flex items-center px-4 py-2 bg-orange-700 text-white rounded-lg text-sm font-medium hover:bg-orange-800 transition duration-150">
+          <Lock className="w-4 h-4 mr-1" /> Login Staff
+        </a>
+        <button className="flex items-center text-white hover:text-gray-200 transition duration-150">
+          <Search className="w-5 h-5 mr-1" /> Lacak
+        </button>
+        <button className="relative p-2 text-white hover:text-gray-200 transition duration-150">
+          <ShoppingCart className="w-6 h-6" />
+          {/* Badge untuk Keranjang */}
+          <span className="absolute top-0 right-0 block h-3 w-3 rounded-full ring-2 ring-orange-600 bg-red-500 text-xs text-white"></span>
+        </button>
+      </div>
+    </div>
+  </header>
+);
 
-export default function Login({
-    status,
-    canResetPassword,
-    canRegister,
-}: LoginProps) {
-    return (
-        <AuthLayout
-            title="Log in to your account"
-            description="Enter your email and password below to log in"
-        >
-            <Head title="Log in" />
+// Komponen Utama Login Staff
+export default function LoginPage() {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
-            <Form
-                {...store.form()}
-                resetOnSuccess={['password']}
-                className="flex flex-col gap-6"
+  // Tipe e diubah menjadi React.FormEvent<HTMLFormElement> untuk form submit
+  const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError('');
+    
+    // Simulasikan panggilan API login di sini
+    if (username && password) {
+      console.log('Attempting login...');
+      // Setelah berhasil login, arahkan ke dashboard
+      // window.location.href = '/dashboard'; 
+    } else {
+      setError('Username dan Password harus diisi.');
+    }
+  };
+
+  // Tipe e diubah menjadi React.ChangeEvent<HTMLInputElement>
+  const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      setUsername(e.target.value);
+  };
+  
+  // Tipe e diubah menjadi React.ChangeEvent<HTMLInputElement>
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      setPassword(e.target.value);
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-100 flex flex-col pt-16">
+      <AuthHeader />
+      
+      <main className="flex-1 flex items-center justify-center p-4">
+        <div className="w-full max-w-xs bg-white p-8 rounded-xl shadow-2xl border border-gray-200">
+          <h2 className="text-2xl font-bold text-gray-800 text-center mb-8">Login Staff</h2>
+          
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div>
+              <label htmlFor="username" className="sr-only">Username</label>
+              <input
+                id="username"
+                name="username"
+                type="text"
+                required
+                value={username}
+                onChange={handleUsernameChange} // Menggunakan handler spesifik
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-orange-500 focus:border-orange-500"
+                placeholder="Username"
+              />
+            </div>
+            
+            <div>
+              <label htmlFor="password" className="sr-only">Password</label>
+              <input
+                id="password"
+                name="password"
+                type="password"
+                required
+                value={password}
+                onChange={handlePasswordChange} // Menggunakan handler spesifik
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-orange-500 focus:border-orange-500"
+                placeholder="Password"
+              />
+              {error && <p className="mt-2 text-sm text-red-600 text-center">{error}</p>}
+            </div>
+            
+            <button
+              type="submit"
+              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-lg shadow-md text-sm font-bold text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition duration-150 mt-6"
             >
-                {({ processing, errors }) => (
-                    <>
-                        <div className="grid gap-6">
-                            <div className="grid gap-2">
-                                <Label htmlFor="email">Email address</Label>
-                                <Input
-                                    id="email"
-                                    type="email"
-                                    name="email"
-                                    required
-                                    autoFocus
-                                    tabIndex={1}
-                                    autoComplete="email"
-                                    placeholder="email@example.com"
-                                />
-                                <InputError message={errors.email} />
-                            </div>
+              Masuk
+            </button>
+          </form>
 
-                            <div className="grid gap-2">
-                                <div className="flex items-center">
-                                    <Label htmlFor="password">Password</Label>
-                                    {canResetPassword && (
-                                        <TextLink
-                                            href={request()}
-                                            className="ml-auto text-sm"
-                                            tabIndex={5}
-                                        >
-                                            Forgot password?
-                                        </TextLink>
-                                    )}
-                                </div>
-                                <Input
-                                    id="password"
-                                    type="password"
-                                    name="password"
-                                    required
-                                    tabIndex={2}
-                                    autoComplete="current-password"
-                                    placeholder="Password"
-                                />
-                                <InputError message={errors.password} />
-                            </div>
-
-                            <div className="flex items-center space-x-3">
-                                <Checkbox
-                                    id="remember"
-                                    name="remember"
-                                    tabIndex={3}
-                                />
-                                <Label htmlFor="remember">Remember me</Label>
-                            </div>
-
-                            <Button
-                                type="submit"
-                                className="mt-4 w-full"
-                                tabIndex={4}
-                                disabled={processing}
-                                data-test="login-button"
-                            >
-                                {processing && <Spinner />}
-                                Log in
-                            </Button>
-                        </div>
-
-                        {canRegister && (
-                            <div className="text-center text-sm text-muted-foreground">
-                                Don't have an account?{' '}
-                                <TextLink href={register()} tabIndex={5}>
-                                    Sign up
-                                </TextLink>
-                            </div>
-                        )}
-                    </>
-                )}
-            </Form>
-
-            {status && (
-                <div className="mb-4 text-center text-sm font-medium text-green-600">
-                    {status}
-                </div>
-            )}
-        </AuthLayout>
-    );
+          <div className="mt-6 text-center space-y-2">
+            <a href="/register" className="text-sm font-medium text-indigo-600 hover:text-indigo-500 block">
+              Belum punya akun? Daftar disini
+            </a>
+            <a href="/gate" className="text-sm font-medium text-gray-600 hover:text-gray-900 block">
+              Kembali ke Menu Pembeli
+            </a>
+          </div>
+        </div>
+      </main>
+    </div>
+  );
 }

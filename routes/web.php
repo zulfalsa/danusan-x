@@ -6,8 +6,13 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\Seller\ProductController as SellerProductController;
 use App\Http\Controllers\Seller\OrderController as SellerOrderController;
 use App\Http\Controllers\Admin\PaymentController as AdminPaymentController;
+use App\Http\Controllers\GateController; // <--- Import Controller Gate
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+
+// --- GATEKEEPING ROUTES (Halaman Kunci) ---
+Route::get('/secret-gate', [GateController::class, 'show'])->name('gate.form');
+Route::post('/secret-gate', [GateController::class, 'unlock'])->name('gate.unlock');
 
 // --- HALAMAN PUBLIK (PEMBELI/GUEST) ---
 Route::get('/', [ProductController::class, 'index'])->name('home');

@@ -146,7 +146,7 @@ function Home({ products = [] }: { products: any[] }) {
           <div className="max-w-lg text-center md:text-left">
             <h2 className="text-2xl md:text-4xl font-bold mb-4 text-black">Selamat Datang, Folks!</h2>
             <p className="text-gray-600 leading-relaxed text-sm md:text-base">
-              dengan membeli danusan kami, kamu telah mendukung kegiatan X berjalan dengan baik. Oh iya, kau bisa belanja tanpa perlu login!
+              dengan membeli danusan kami, kamu telah mendukung kegiatan X berjalan dengan baik. Oh iya, kamu bisa belanja tanpa perlu login!
             </p>
           </div>
         </div>

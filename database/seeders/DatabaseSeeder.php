@@ -3,8 +3,8 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash; // Tambahkan Hash untuk mengenkripsi password
 
 class DatabaseSeeder extends Seeder
 {
@@ -13,15 +13,29 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
+        // 1. Contoh Pengguna Admin (Role: admin)
         User::firstOrCreate(
-            ['email' => 'test@example.com'],
+            ['email' => 'admin@danusanx.com'],
             [
-                'name' => 'Test User',
-                'password' => 'password',
+                'name' => 'Admin Danusan',
+                // Pastikan password dienkripsi
+                'password' => Hash::make('password123'), 
                 'email_verified_at' => now(),
+                'role' => 'admin', // ROLE DITAMBAHKAN
             ]
         );
+
+        // 2. Contoh Pengguna Penjual (Role: penjual)
+        User::firstOrCreate(
+            ['email' => 'seller@danusanx.com'],
+            [
+                'name' => 'Penjual Utama',
+                // Pastikan password dienkripsi
+                'password' => Hash::make('password123'),
+                'email_verified_at' => now(),
+                'role' => 'penjual', // ROLE DITAMBAHKAN
+            ]
+        );
+        
     }
 }

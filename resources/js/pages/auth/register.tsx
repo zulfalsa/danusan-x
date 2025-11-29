@@ -12,7 +12,7 @@ const REGISTER_ENDPOINT = `${API_BASE_URL}/register`; // Asumsi endpoint registr
 // --- Komponen Header Navigasi Disesuaikan dengan Template User ---
 const AuthHeader = () => {
     
-    // Fungsi Navigasi (Ensures absolute path starting with '/')
+    // Fungsi Navigasi (Memastikan path absolut dimulai dengan '/')
     const navigateTo = (path: string) => {
         // Ensures path starts with / unless it's the root '/'
         const targetPath = path === '' || path === '/' ? '/' : `/${path.replace(/^\/+/g, '')}`;
@@ -70,7 +70,7 @@ const AuthHeader = () => {
                 {/* Right Navigation */}
                 <div className="flex items-center gap-6">
                     
-                    {/* Login Staff: DIARAHKAN KE GATE */}
+                    {/* Login Staff: NAVIGATE TO /auth/gate */}
                     <button 
                         onClick={() => navigateTo('auth/gate')} // Diarahkan ke GATE dulu
                         className="flex items-center gap-1 bg-orange-700 hover:bg-orange-800 transition-colors px-3 py-1.5 rounded-md font-medium text-sm shadow-lg">
@@ -84,7 +84,7 @@ const AuthHeader = () => {
                         <span className="font-medium">Lacak</span>
                     </button>
 
-                    {/* Cart */}
+                    {/* Keranjang */}
                     <button onClick={() => navigateTo('cart')} className="hover:text-orange-100 relative">
                         <ShoppingCartIcon />
                         {/* Red Cart Badge */}
@@ -100,6 +100,7 @@ const AuthHeader = () => {
 const App = () => {
   const [role, setRole] = useState('Penjual');
   const [username, setUsername] = useState('');
+  const [email, setEmail] = useState(''); // STATE BARU UNTUK EMAIL
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
@@ -119,7 +120,7 @@ const App = () => {
     setSuccess('');
     setIsLoading(true);
 
-    if (username.trim() === '' || password.trim() === '' || confirmPassword.trim() === '') {
+    if (username.trim() === '' || email.trim() === '' || password.trim() === '' || confirmPassword.trim() === '') {
       setError('Harap lengkapi semua bidang.');
       setIsLoading(false);
       return;
@@ -131,7 +132,6 @@ const App = () => {
       return;
     }
     
-    // Minimal panjang password (sesuaikan dengan aturan Laravel)
     if (password.length < 8) {
         setError('Password harus minimal 8 karakter.');
         setIsLoading(false);
@@ -147,9 +147,8 @@ const App = () => {
           'Accept': 'application/json',
         },
         body: JSON.stringify({
-          // Asumsi 'name' atau 'username' di Laravel, dan mock email
           name: username, 
-          email: `${username.toLowerCase()}@danusanx.com`, 
+          email: email, // MENGIRIM EMAIL DARI INPUT BARU
           password: password,
           password_confirmation: confirmPassword,
           role: role.toLowerCase(), // Kirim role yang dipilih
@@ -158,22 +157,23 @@ const App = () => {
 
       const data = await response.json();
 
-      if (response.ok) {
+      if (response.ok) { 
         console.log('Registrasi Berhasil. User:', data.user);
         setSuccess('Pendaftaran berhasil! Anda dapat login sekarang.');
+        
         // Setelah registrasi, arahkan ke halaman login
         setTimeout(() => {
           handleLoginNavigation();
         }, 2000);
       } else {
         // Tangani error yang dikirim oleh Laravel
-        const errorMessage = data.message || 'Gagal mendaftar. Cek kembali data Anda.';
+        const errorMessage = data.message || `Gagal mendaftar. (Error: ${response.status}). Mohon cek rute POST /api/register di backend Anda.`;
         setError(errorMessage);
         setIsLoading(false);
       }
     } catch (e) {
       console.error("Error during register API call:", e);
-      setError("Gagal terhubung ke server. Cek URL API atau koneksi Anda.");
+      setError("Gagal terhubung ke server. Pastikan server Laravel (POST /api/register) berjalan.");
       setIsLoading(false);
     }
   };
@@ -181,8 +181,8 @@ const App = () => {
   // Fungsi navigasi ke Login
   const handleLoginNavigation = () => {
     console.log('Navigasi ke halaman Login');
-    // PERBAIKAN: Gunakan path absolut /auth/login
-    window.location.href = `/auth/login`;
+    // MENGGUNAKAN PATH ABSOLUT LARAVEL: /login
+    window.location.href = `/login`;
   };
 
   return (
@@ -229,6 +229,22 @@ const App = () => {
               />
             </div>
             
+            {/* Input Email BARU */}
+            <div>
+              <label htmlFor="email" className="sr-only">Email</label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                required
+                value={email}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-orange-500 focus:border-orange-500"
+                placeholder="Email"
+                disabled={isLoading}
+              />
+            </div>
+
             {/* Input Password */}
             <div>
               <label htmlFor="password" className="sr-only">Password</label>

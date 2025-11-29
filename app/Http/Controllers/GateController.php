@@ -34,7 +34,7 @@ class GateController extends Controller
         // Cek password.
         // NOTE: Di production, sebaiknya ambil dari .env, misal: env('GATE_PASSWORD')
         // Untuk sekarang kita set 'rahasia123'
-        $correctPassword = env('GATE_PASSWORD', 'rahasia123');
+        $correctPassword = env('GATE_PASSWORD', 'admin123');
 
         if ($request->password === $correctPassword) {
             // Jika benar, simpan tanda di session

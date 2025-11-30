@@ -1,100 +1,130 @@
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Head, useForm } from '@inertiajs/react';
-import { AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Package, Search, ShoppingCart, CheckCircle, Copy } from 'lucide-react';
+import React, { useState, ReactNode } from 'react';
 
-declare global {
-    var route: any;
+// --- START: PLACEHOLDER IMPORTS (for Inertia) ---
+interface HeadProps {
+    title: string;
+}
+const Head = ({ title }: HeadProps) => <title>{title}</title>;
+
+interface LinkProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
+    href: string;
+    children: ReactNode;
+    className?: string;
 }
 
-export default function Payment({ order, payment, qris_url }: any) {
-    const { data, setData, post, progress, processing } = useForm({
-        proof: null as File | null,
-    });
+const Link = ({ href, children, className, ...props }: LinkProps) => (
+    <a href={href} className={className} {...props}>
+        {children}
+    </a>
+);
+// --- END: PLACEHOLDER IMPORTS ---
 
-    const handleUpload = (e: React.FormEvent) => {
-        e.preventDefault();
-        post(`/order/payment/${order.order_id}`, {
-            forceFormData: true
-        }  
-        );
+interface OrderSuccessProps {
+    trackingCode: string; // Assuming the tracking code is passed as a prop
+}
+
+export default function OrderSuccess({ trackingCode }: OrderSuccessProps) {
+    const [isCopied, setIsCopied] = useState(false);
+
+    // Function to copy text to clipboard (using document.execCommand for iFrame compatibility)
+    const copyToClipboard = () => {
+        const tempInput = document.createElement('input');
+        tempInput.value = trackingCode;
+        document.body.appendChild(tempInput);
+        tempInput.select();
+        document.execCommand('copy');
+        document.body.removeChild(tempInput);
+
+        setIsCopied(true);
+        setTimeout(() => setIsCopied(false), 2000);
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 py-10 px-4">
-            <Head title={`Pembayaran - ${order.tracking_code}`} />
+        <div className="min-h-screen bg-orange-50 pb-12">
+            <Head title="Pesanan Berhasil" />
             
-            <div className="max-w-xl mx-auto space-y-6">
-                <Card className={`border-l-4 ${order.status === 'menunggu verifikasi' ? 'border-yellow-500' : 'border-blue-500'}`}>
-                    <CardContent className="pt-6 flex items-center gap-3">
-                        <AlertCircle className="h-6 w-6 text-gray-600" />
-                        <div>
-                            <p className="font-bold uppercase">{order.status}</p>
-                            <p className="text-sm text-gray-500">Kode Tracking: <span className="font-mono font-bold">{order.tracking_code}</span></p>
-                        </div>
-                    </CardContent>
-                </Card>
+            {/* --- 1. Navigation Bar (Orange Theme) --- */}
+            <nav className="bg-orange-600 shadow-xl sticky top-0 z-50">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+                    {/* Logo and App Name */}
+                    <Link href="/" className="flex items-center space-x-2">
+                        <Package className="h-7 w-7 text-white" />
+                        <div className="font-extrabold text-2xl text-white tracking-wide">Danusan-X</div>
+                    </Link>
+                    
+                    {/* Navigation Links and Actions */}
+                    <div className="flex items-center gap-6">
+                        {/* Login Staff Button */}
+                        <Link href="/login">
+                            <Button className="bg-white text-orange-600 font-bold hover:bg-orange-100 shadow-md">
+                                Login Staff
+                            </Button>
+                        </Link>
+                        {/* Lacak Pesanan */}
+                        <Link href="/order/track" className="flex items-center text-white text-sm font-medium hover:text-orange-200 transition">
+                            <Search className="h-5 w-5 mr-1" />
+                            Lacak
+                        </Link>
+                        {/* Cart Icon */}
+                        <Link href="/cart/checkout">
+                            <Button variant="outline" size="icon" className="bg-transparent border-white text-white hover:bg-white hover:text-orange-600">
+                                <ShoppingCart className="h-5 w-5" />
+                            </Button>
+                        </Link>
+                    </div>
+                </div>
+            </nav>
 
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Instruksi Pembayaran</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-6">
-                        <div className="text-center">
-                            <p className="text-sm text-gray-500 mb-2">Total Tagihan</p>
-                            <p className="text-3xl font-bold text-primary">Rp {order.total_price.toLocaleString('id-ID')}</p>
-                        </div>
+            {/* --- 2. Confirmation Content --- */}
+            <main className="max-w-xl mx-auto p-4 sm:p-6 lg:p-8 pt-16">
+                <div className="bg-white p-8 rounded-xl shadow-2xl border border-gray-200 text-center space-y-8">
+                    
+                    {/* Success Icon and Message */}
+                    <div>
+                        <CheckCircle className="h-16 w-16 text-green-600 mx-auto" />
+                        <h1 className="text-2xl font-bold text-gray-800 mt-4">Pesanan Berhasil Dikirimi!</h1>
+                    </div>
 
-                        <div className="flex justify-center">
-                            <div className="border-2 border-dashed border-gray-300 p-4 rounded-lg bg-white">
-                                <img src={qris_url} alt="QRIS Code" className="w-48 h-48 object-contain" />
-                            </div>
+                    {/* Order ID Box (Styled to match design) */}
+                    <div className="bg-gray-100 p-6 rounded-lg border border-gray-200">
+                        <p className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2">ID PESANAN</p>
+                        
+                        <div className="relative inline-block">
+                            <p className="text-4xl font-extrabold text-orange-600">{trackingCode}</p>
+                            
+                            {/* Copy Button */}
+                            <button 
+                                onClick={copyToClipboard}
+                                className={`mt-2 text-sm font-medium transition-colors flex items-center mx-auto ${
+                                    isCopied ? 'text-green-600' : 'text-orange-500 hover:text-orange-600'
+                                }`}
+                            >
+                                <Copy className="h-4 w-4 mr-1" />
+                                {isCopied ? 'ID Disimpan!' : 'Simpan ID untuk Pengecekan'}
+                            </button>
                         </div>
-                        <p className="text-center text-sm text-gray-500">Scan QRIS di atas untuk membayar.</p>
-                    </CardContent>
-                </Card>
+                    </div>
 
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Konfirmasi Pembayaran</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        {payment ? (
-                             <div className="text-center py-6 space-y-3">
-                                <div className="flex justify-center text-green-500">
-                                    <CheckCircle2 className="h-12 w-12" />
-                                </div>
-                                <h3 className="font-bold text-lg">Bukti Terkirim!</h3>
-                                <p className="text-gray-500">Admin sedang memverifikasi pembayaran Anda.</p>
-                                <img src={`/storage/${payment.proof}`} alt="Bukti" className="h-32 mx-auto mt-4 rounded border" />
-                            </div>
-                        ) : (
-                            <form onSubmit={handleUpload} className="space-y-4">
-                                <div className="space-y-2">
-                                    <Label htmlFor="proof">Unggah Bukti Transfer</Label>
-                                    <Input 
-                                        id="proof" 
-                                        type="file" 
-                                        accept="image/*"
-                                        onChange={e => setData('proof', e.currentTarget.files ? e.currentTarget.files[0] : null)}
-                                        required
-                                    />
-                                    {progress && (
-                                      <div className="w-full bg-gray-200 rounded-full h-2.5">
-                                        <div className="bg-blue-600 h-2.5 rounded-full" style={{ width: `${progress.percentage}%` }}></div>
-                                      </div>
-                                    )}
-                                </div>
-                                <Button type="submit" className="w-full" disabled={processing}>
-                                    Kirim Bukti Pembayaran
-                                </Button>
-                            </form>
-                        )}
-                    </CardContent>
-                </Card>
-            </div>
+                    {/* Verification Message */}
+                    <p className="text-gray-600">Mohon tunggu verifikasi dari admin</p>
+
+                    {/* Action Buttons */}
+                    <div className="flex justify-center space-x-4 pt-4">
+                        <Link href={`/order/track?code=${trackingCode}`}>
+                            <Button className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold text-lg px-8 shadow-md transition-colors">
+                                Lacak Status
+                            </Button>
+                        </Link>
+                        <Link href="/">
+                            <Button className="bg-orange-600 hover:bg-orange-700 font-bold text-lg px-8 shadow-md transition-colors">
+                                Kembali ke Beranda
+                            </Button>
+                        </Link>
+                    </div>
+                </div>
+            </main>
         </div>
     );
 }

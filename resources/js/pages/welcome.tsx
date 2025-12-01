@@ -4,10 +4,6 @@ import { ShoppingCart, Package, Search } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import React, { ReactNode } from 'react'; // Added React and ReactNode for typing
 
-// --- START: FIX FOR RESOLUTION ERROR & TS ERRORS ---
-// The following components replace the import from '@inertiajs/react' 
-// (Head, Link) to allow compilation in this sandboxed environment, 
-// while preserving the original app's JSX structure and props, now with typing.
 
 interface HeadProps {
     title: string;

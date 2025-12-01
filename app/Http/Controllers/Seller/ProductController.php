@@ -107,6 +107,11 @@ class ProductController extends Controller
             ->where('seller_id', $userId)
             ->firstOrFail();
 
+        // ✅ CEK: Jika produk sudah punya order, tolak hapus
+        if ($product->orderItems()->exists()) {
+            return redirect()->back()->with('error', 'Produk tidak dapat dihapus karena sudah memiliki pesanan.');
+        }
+
         // Hapus file gambar dari storage
         if ($product->image) {
             Storage::disk('public')->delete($product->image);

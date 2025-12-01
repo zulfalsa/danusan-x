@@ -12,7 +12,7 @@ import { store } from '@/routes/login';
 import { request } from '@/routes/password';
 import { Form, Head } from '@inertiajs/react'; // FIX: Link dihapus dari impor Inertia
 import { Package, Search, ShoppingCart } from "lucide-react"; // Import ikon Navigasi Bar
-import React, { useState, ReactNode } from "react"; // Diperlukan untuk placeholder
+import React, { useState, ReactNode, useEffect } from "react"; // Diperlukan untuk placeholder
 
 // --- GLOBAL TYPE DECLARATIONS ---
 declare global {
@@ -68,8 +68,18 @@ const Link = ({ href, children, className, ...props }: PlaceholderLinkProps) => 
 // --- END: PLACEHOLDER INERTIA IMPORTS ---
 
 // Placeholder untuk AuthLayout, menggunakan properti title dan description
-const AuthLayoutPlaceholder = ({ title, description, children }: { title: string, description: string, children: React.ReactNode }) => (
-    <div className="min-h-screen bg-orange-50 flex flex-col">
+const AuthLayoutPlaceholder = ({
+    title,
+    description,
+    cartCount,
+    children
+}: {
+    title: string,
+    description: string,
+    cartCount: number,
+    children: React.ReactNode
+}) => (
+    <div className="min-h-screen bg-orange-50">
         {/* Navigasi Bar Oranye (Disalin dari Gatekeeper.jsx) */}
         <nav className="bg-orange-600 shadow-xl sticky top-0 z-50">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
@@ -87,11 +97,17 @@ const AuthLayoutPlaceholder = ({ title, description, children }: { title: string
                         <Search className="h-5 w-5 mr-1" />
                         Lacak
                     </Link>
-                    <Link href="/cart/checkout">
-                        <Button className="bg-transparent border-white text-white hover:bg-white hover:text-orange-600 p-2">
-                            <ShoppingCart className="h-5 w-5" />
-                        </Button>
-                    </Link>
+                        {/* Cart Icon */}
+                        <Link href="/cart/checkout" className="relative">
+                            <Button variant="outline" size="icon" className="bg-transparent border-white text-white hover:bg-white hover:text-orange-600">
+                                <ShoppingCart className="h-5 w-5" />
+                                {cartCount > 0 && (
+                                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center border-2 border-orange-600">
+                                        {cartCount}
+                                    </span>
+                                )}
+                            </Button>
+                        </Link>
                 </div>
             </div>
         </nav>
@@ -113,11 +129,18 @@ export default function Login({
     canResetPassword,
     canRegister,
 }: LoginProps) {
+    const [cartCount, setCartCount] = useState(0);
+
+    useEffect(() => {
+        const cart = JSON.parse(localStorage.getItem('danusan_cart') || '[]');
+        setCartCount(cart.length);
+    }, []);
     return (
         // Mengganti AuthLayout dengan AuthLayoutPlaceholder untuk kompilasi mandiri
         <AuthLayoutPlaceholder
             title="Login Staff" 
             description="Masukkan email dan password Anda untuk masuk ke dashboard penjual." 
+            cartCount={cartCount}
         >
             <Head title="Log in" />
 

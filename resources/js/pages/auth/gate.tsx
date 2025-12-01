@@ -1,7 +1,8 @@
-import React, { useState, ReactNode } from "react";
-import { useForm } from "@inertiajs/react";
+import React, { useState, ReactNode, useEffect } from "react";
+import { Head, useForm } from "@inertiajs/react";
 import { Link } from "@inertiajs/react";
 import { Package, Search, ShoppingCart } from "lucide-react";
+import { Button } from '@/components/ui/button';
 
 interface LinkProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
     href: string;
@@ -16,6 +17,13 @@ const CustomLink = ({ href, children, className, ...props }: LinkProps) => (
 );
 
 export default function Gate() {
+    const [cartCount, setCartCount] = useState(0);
+
+    useEffect(() => {
+        // NOTE: Keeping existing logic strictly as per rule 1.
+        const cart = JSON.parse(localStorage.getItem('danusan_cart') || '[]');
+        setCartCount(cart.length);
+    }, []);
     const { data, setData, post, processing, errors } = useForm({
         password: "",
     });
@@ -27,31 +35,46 @@ export default function Gate() {
 
     return (
         <div className="min-h-screen bg-orange-50 flex flex-col">
-            <header className="flex items-center justify-between px-4 sm:px-6 lg:px-8 py-4 bg-orange-600 shadow-xl sticky top-0 z-50">
-                <div className="flex items-center space-x-2">
-                    <CustomLink href="/" className="flex items-center space-x-2">
+            <Head title="Secret Gate" />
+            
+            {/* --- 1. Navigation Bar (Orange Theme) --- */}
+            <nav className="bg-orange-600 shadow-xl sticky top-0 z-50">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+                    {/* Logo and App Name */}
+                    <div className="flex items-center space-x-2">
                         <Package className="h-7 w-7 text-white" />
-                        <h1 className="text-2xl font-extrabold text-white tracking-wide">Danusan-X</h1>
-                    </CustomLink>
+                        <div className="font-extrabold text-2xl text-white tracking-wide">Danusan-X</div>
+                    </div>
+                    
+                    {/* Navigation Links and Actions */}
+                    <div className="flex items-center gap-6">
+                        {/* Login Staff Button (Styled Link) */}
+                        <Link href="/login">
+                            <Button className="bg-white text-orange-600 font-bold hover:bg-orange-100 shadow-md">
+                                Login Staff
+                            </Button>
+                        </Link>
+
+                        {/* Lacak Pesanan (Search Icon) */}
+                        <Link href="/order/track" className="flex items-center text-white text-sm font-medium hover:text-orange-200 transition">
+                            <Search className="h-5 w-5 mr-1" />
+                            Lacak
+                        </Link>
+                        
+                        {/* Cart Icon */}
+                        <Link href="/cart/checkout" className="relative">
+                            <Button variant="outline" size="icon" className="bg-transparent border-white text-white hover:bg-white hover:text-orange-600">
+                                <ShoppingCart className="h-5 w-5" />
+                                {cartCount > 0 && (
+                                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center border-2 border-orange-600">
+                                        {cartCount}
+                                    </span>
+                                )}
+                            </Button>
+                        </Link>
+                    </div>
                 </div>
-
-                <div className="flex items-center space-x-6">
-                    <CustomLink href="/secret-gate">
-                        <button className="bg-white text-orange-600 font-bold py-2 px-4 rounded-lg shadow-md hover:bg-orange-100 transition">
-                            Login Staff
-                        </button>
-                    </CustomLink>
-
-                    <CustomLink href="/order/track" className="flex items-center text-white font-medium hover:text-orange-200 transition">
-                        <Search className="h-5 w-5 mr-1" />
-                        Lacak
-                    </CustomLink>
-
-                    <CustomLink href="/cart/checkout" className="relative">
-                        <ShoppingCart className="h-6 w-6 text-white" />
-                    </CustomLink>
-                </div>
-            </header>
+            </nav>
 
             <div className="flex justify-center items-center flex-grow p-6">
                 <div className="bg-white w-full max-w-md p-8 rounded-xl shadow-2xl border border-gray-200 text-center">

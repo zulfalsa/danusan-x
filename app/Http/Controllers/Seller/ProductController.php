@@ -16,12 +16,7 @@ class ProductController extends Controller
      */
     public function index()
     {
-        // Pastikan menggunakan primary key user yang benar (user_id sesuai sql)
-        $userId = Auth::user()->user_id ?? Auth::id();
-
-        $products = Product::where('seller_id', $userId)
-            ->latest()
-            ->get();
+        $products = Product::latest()->get();
 
         return Inertia::render('seller/products/index', [
             'products' => $products

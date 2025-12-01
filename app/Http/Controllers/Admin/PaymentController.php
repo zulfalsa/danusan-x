@@ -15,13 +15,14 @@ class PaymentController extends Controller
     public function index()
     {
         $payments = Payment::with('order')
-            ->where('status', 'menunggu verifikasi')
+            ->orderBy('created_at', 'desc') // terbaru dulu
             ->get();
 
         return Inertia::render('admin/payments/index', [
             'payments' => $payments
         ]);
     }
+
 
     public function verify(Request $request, $payment_id)
     {

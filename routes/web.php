@@ -23,7 +23,6 @@ Route::get('/cart/checkout', [OrderController::class, 'create'])->name('order.ch
 Route::post('/order', [OrderController::class, 'store'])->name('order.store');
 Route::get('/order/track', [OrderController::class, 'track'])->name('order.track');
 Route::get('/order/payment/{tracking_code}', [OrderController::class, 'showPayment'])->name('order.payment');
-Route::post('/order/payment/{order_id}', [OrderController::class, 'uploadProof'])->name('payment.upload');
 Route::post('/order/{tracking_code}/cancel', [OrderController::class, 'cancel'])->name('order.cancel');
 
 

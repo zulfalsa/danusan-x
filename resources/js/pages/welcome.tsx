@@ -76,6 +76,13 @@ export default function Welcome({ products }: { products: Product[] }) {
                     
                     {/* Navigation Links and Actions */}
                     <div className="flex items-center gap-6">
+                        {/* Login Staff Button (Styled Link) */}
+                        <Link href="/login">
+                            <Button className="bg-white text-orange-600 font-bold hover:bg-orange-100 shadow-md">
+                                Login Staff
+                            </Button>
+                        </Link>
+
                         {/* Lacak Pesanan (Search Icon) */}
                         <Link href="/order/track" className="flex items-center text-white text-sm font-medium hover:text-orange-200 transition">
                             <Search className="h-5 w-5 mr-1" />
@@ -91,13 +98,6 @@ export default function Welcome({ products }: { products: Product[] }) {
                                         {cartCount}
                                     </span>
                                 )}
-                            </Button>
-                        </Link>
-                        
-                        {/* Login Staff Button (Styled Link) */}
-                        <Link href="/login">
-                            <Button className="bg-white text-orange-600 font-bold hover:bg-orange-100 shadow-md">
-                                Login Staff
                             </Button>
                         </Link>
                     </div>
